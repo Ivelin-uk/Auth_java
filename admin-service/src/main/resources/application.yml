@@ -1,0 +1,32 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: admin-service
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_service_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: 
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+# Auth Service Configuration
+auth-service:
+  url: http://localhost:8081
+  validate-endpoint: /api/auth/validate
+
+# Logging
+logging:
+  level:
+    com.microservices.adminservice: DEBUG
+    org.springframework.security: DEBUG

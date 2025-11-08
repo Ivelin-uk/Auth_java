@@ -30,6 +30,7 @@
 
     <modules>
         <module>auth-service</module>
+        <module>admin-service</module>
     </modules>
 
     <dependencyManagement>
