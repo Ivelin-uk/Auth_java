@@ -1,20 +1,25 @@
 package com.microservices.adminservice.client;
 
-import com.microservices.adminservice.dto.ValidateTokenRequest;
-import com.microservices.adminservice.dto.ValidateTokenResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-@Slf4j
+import com.microservices.adminservice.dto.ValidateTokenRequest;
+import com.microservices.adminservice.dto.ValidateTokenResponse;
+
 @Component
-@RequiredArgsConstructor
 public class AuthServiceClient {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceClient.class);
+
     private final RestTemplate restTemplate;
+
+    public AuthServiceClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Value("${auth-service.url}")
     private String authServiceUrl;
@@ -25,9 +30,7 @@ public class AuthServiceClient {
     public ValidateTokenResponse validateToken(String token) {
         try {
             String url = authServiceUrl + validateEndpoint;
-            ValidateTokenRequest request = ValidateTokenRequest.builder()
-                    .token(token)
-                    .build();
+            ValidateTokenRequest request = new ValidateTokenRequest(token);
 
             log.debug("Validating token with Auth Service at: {}", url);
             
@@ -42,10 +45,7 @@ public class AuthServiceClient {
             
         } catch (RestClientException e) {
             log.error("Error communicating with Auth Service", e);
-            return ValidateTokenResponse.builder()
-                    .valid(false)
-                    .message("Failed to validate token: " + e.getMessage())
-                    .build();
+            return new ValidateTokenResponse(false, null, "Failed to validate token: " + e.getMessage());
         }
     }
 }

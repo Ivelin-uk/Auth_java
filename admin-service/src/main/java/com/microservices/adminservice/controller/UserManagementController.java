@@ -1,25 +1,43 @@
 package com.microservices.adminservice.controller;
 
-import com.microservices.adminservice.client.AuthServiceClient;
-import com.microservices.adminservice.dto.*;
-import com.microservices.adminservice.service.UserManagementService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.microservices.adminservice.client.AuthServiceClient;
+import com.microservices.adminservice.dto.ResetPasswordRequest;
+import com.microservices.adminservice.dto.UpdateUserRequest;
+import com.microservices.adminservice.dto.UserResponse;
+import com.microservices.adminservice.dto.ValidateTokenResponse;
+import com.microservices.adminservice.service.UserManagementService;
+
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/admin/users")
-@RequiredArgsConstructor
 public class UserManagementController {
+
+    private static final Logger log = LoggerFactory.getLogger(UserManagementController.class);
 
     private final UserManagementService userManagementService;
     private final AuthServiceClient authServiceClient;
+
+    public UserManagementController(UserManagementService userManagementService, AuthServiceClient authServiceClient) {
+        this.userManagementService = userManagementService;
+        this.authServiceClient = authServiceClient;
+    }
 
     /**
      * Get all users

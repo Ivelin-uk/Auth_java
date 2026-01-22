@@ -1,17 +1,23 @@
 package com.microservices.adminservice.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ResetPasswordRequest {
     
     @NotBlank(message = "New password is required")
     private String newPassword;
+
+    public ResetPasswordRequest() {
+    }
+
+    public ResetPasswordRequest(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
 }

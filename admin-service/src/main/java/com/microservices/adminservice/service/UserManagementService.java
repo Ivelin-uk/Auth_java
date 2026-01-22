@@ -1,28 +1,32 @@
 package com.microservices.adminservice.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.microservices.adminservice.dto.ResetPasswordRequest;
 import com.microservices.adminservice.dto.UpdateUserRequest;
 import com.microservices.adminservice.dto.UserResponse;
 import com.microservices.adminservice.entity.User;
 import com.microservices.adminservice.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserManagementService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserManagementService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public UserManagementService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     /**
      * Get all users
@@ -164,14 +168,14 @@ public class UserManagementService {
      * Map User entity to UserResponse DTO
      */
     private UserResponse mapToResponse(User user) {
-        return UserResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .enabled(user.isEnabled())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .build();
+        return new UserResponse(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getRole(),
+            user.isEnabled(),
+            user.getCreatedAt(),
+            user.getUpdatedAt()
+        );
     }
 }
