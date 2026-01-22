@@ -5,6 +5,8 @@ import com.microservices.authservice.dto.RegisterRequest;
 import com.microservices.authservice.dto.AuthResponse;
 import com.microservices.authservice.entity.Role;
 import com.microservices.authservice.entity.User;
+import com.microservices.authservice.exception.BadRequestException;
+import com.microservices.authservice.exception.NotFoundException;
 import com.microservices.authservice.repository.UserRepository;
 import com.microservices.authservice.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +27,12 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
         // Check if username already exists
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new BadRequestException("Username already exists");
         }
 
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new BadRequestException("Email already exists");
         }
 
         // Create new user
@@ -63,7 +65,7 @@ public class AuthService {
         );
 
         var user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
         var jwtToken = jwtService.generateToken(user);
 
@@ -77,7 +79,7 @@ public class AuthService {
 
     public boolean validateToken(String token, String username) {
         var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         return jwtService.isTokenValid(token, user);
     }
 
