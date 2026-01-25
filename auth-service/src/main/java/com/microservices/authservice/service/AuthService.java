@@ -1,18 +1,19 @@
 package com.microservices.authservice.service;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.microservices.authservice.dto.AuthResponse;
 import com.microservices.authservice.dto.LoginRequest;
 import com.microservices.authservice.dto.RegisterRequest;
-import com.microservices.authservice.dto.AuthResponse;
 import com.microservices.authservice.entity.Role;
 import com.microservices.authservice.entity.User;
 import com.microservices.authservice.exception.BadRequestException;
 import com.microservices.authservice.exception.NotFoundException;
 import com.microservices.authservice.repository.UserRepository;
 import com.microservices.authservice.security.JwtService;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
@@ -87,12 +88,19 @@ public class AuthService {
     }
 
     public boolean validateToken(String token, String username) {
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-        return jwtService.isTokenValid(token, user);
+        if (token == null || token.isBlank() || username == null || username.isBlank()) {
+            return false;
+        }
+
+        var userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+
+        return jwtService.isTokenValid(token, userOpt.get());
     }
 
     public String extractUsername(String token) {
-        return jwtService.extractUsername(token);
+        return jwtService.safeExtractUsername(token);
     }
 }
